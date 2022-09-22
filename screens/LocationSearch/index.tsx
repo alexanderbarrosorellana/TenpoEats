@@ -30,7 +30,6 @@ const LocationSearch = ({navigation}: any) => {
 
       if (granted) {
         const coords = getCoords();
-        console.log(coords);
         // const address = await Geocoder.from(coords.latitude, coords.longitude);
       }
     };
