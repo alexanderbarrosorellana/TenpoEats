@@ -6,11 +6,12 @@ import {
   SparkWrapper,
   SearchIconWrapper,
   LogoSection,
-  Typography,
   ImageContainer,
   ImageWrapper,
   RightContainer,
+  HeaderContainer,
 } from './styles';
+import {Typography} from '../../../../components';
 import ProfilePicture from '../../../../assets/images/Elipse50.png';
 import MotoBoy from '../../../../assets/images/MotoBoy.png';
 import Phone from '../../../../assets/images/Phone.png';
@@ -19,7 +20,7 @@ import SearchIcon from '../../../../assets/icons/SearchIcon.svg';
 import DotsIcon from '../../../../assets/icons/Dots.svg';
 
 const Header = () => (
-  <>
+  <HeaderContainer>
     <HeaderSection>
       <Image source={ProfilePicture} />
       <Container flexDirection="row" marginLeft={100}>
@@ -72,7 +73,7 @@ const Header = () => (
         <DotsIcon />
       </RightContainer>
     </LogoSection>
-  </>
+  </HeaderContainer>
 );
 
 export default Header;

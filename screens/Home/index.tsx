@@ -1,10 +1,18 @@
 import React from 'react';
-import {SafeArea, Header} from './components';
+import {ScrollView} from 'react-native';
+import {SafeArea, Header, Address, Body} from './components';
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
   return (
     <SafeArea>
-      <Header />
+      <ScrollView>
+        <Header />
+        <Address
+          roundedTop
+          onPress={() => navigation.navigate('LocationSearch')}
+        />
+        <Body />
+      </ScrollView>
     </SafeArea>
   );
 };

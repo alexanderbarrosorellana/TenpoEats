@@ -1,10 +1,16 @@
 import styled from 'styled-components/native';
-import {ViewProps, FlexAlignType, TextProps} from 'react-native';
+import {ViewProps, FlexAlignType} from 'react-native';
+
+const HEADER_PADDING = '16px';
+export const HeaderContainer = styled.View`
+  padding-left: ${HEADER_PADDING};
+  padding-right: ${HEADER_PADDING};
+`;
 
 export const HeaderSection = styled.View`
-  backgroundcolor: #f2f2f2;
+  background-color: #f2f2f2;
   flex-direction: row;
-  heigth: 80px;
+  height: 80px;
   width: 100%;
 `;
 
@@ -43,7 +49,7 @@ export const SparkWrapper = styled.View<SparkWrapperProps>`
 
 export const SearchIconWrapper = styled.Pressable`
   width: 24px;
-  heigth: 24px;
+  height: 24px;
 `;
 
 export const LogoSection = styled.View`
@@ -51,22 +57,10 @@ export const LogoSection = styled.View`
   flex-direction: row;
 `;
 
-interface TypographyProps extends TextProps {
-  size?: number;
-  color?: string;
-  fontWeight?: string;
-}
-
-export const Typography = styled.Text<TypographyProps>`
-  ${({fontWeight}) => fontWeight && `font-weight: ${fontWeight}`}
-  ${({size}) => size && `font-size: ${size}`}px;
-  ${({color}) => color && `color: ${color}`};
-`;
-
 export const ImageContainer = styled.View`
   flex-direction: row;
   align-items: flex-start;
-  right: 50;
+  right: 50px;
 `;
 
 interface ImageWrapperProps extends ViewProps {
@@ -77,11 +71,12 @@ interface ImageWrapperProps extends ViewProps {
 
 export const ImageWrapper = styled.View<ImageWrapperProps>`
   ${({zIndex}) => `z-index: ${zIndex}`};
-  ${({left}) => left && `left: ${left}`}px;
-  ${({top}) => top && `top: ${top}`}px;
+  ${({left}) => left && `left: ${left}px`};
+  ${({top}) => top && `top: ${top}px`};
 `;
 
 export const RightContainer = styled.View`
   justify-content: space-between;
   right: 15px;
+  padding-bottom: 8px;
 `;
