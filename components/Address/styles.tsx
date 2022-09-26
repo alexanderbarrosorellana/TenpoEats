@@ -18,3 +18,7 @@ export const AddressContainer = styled.Pressable<AddressContainerProps>`
   `}
   z-index: 0;
 `;
+
+export const AddressTextWrapper = styled.View`
+  width: 296px;
+`;

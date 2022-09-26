@@ -1,42 +1,8 @@
-import {PermissionsAndroid} from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
-import {Alert} from 'react-native';
+import {useGetCoords} from './hooks';
+import {PermissionsAndroid} from 'react-native';
 
-export const requestLocationPermission = async () => {
-  try {
-    const checkLocationPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    );
-
-    if (checkLocationPermission) {
-      console.log('Location permission granted');
-      return true;
-    }
-
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title:
-          '¿Permitir que "Tenpo" acceda a tu ubicación mientras usas la app?',
-        message:
-          'Tu ubicación actual se mostrará en el mapa y se usará para las indicaciones, los resultados de búsqueda y la hora aproximada de llegada',
-        buttonNegative: 'No Permitir',
-        buttonPositive: 'Permitir',
-      },
-    );
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (err) {
-    console.warn(err);
-    return false;
-  }
-};
-
-export const getCoords = () => {
+const getCoords = () => {
   Geolocation.getCurrentPosition(
     success => {
       const {
@@ -50,6 +16,38 @@ export const getCoords = () => {
     },
     {enableHighAccuracy: true},
   );
-
-  console.log('ABERRR: ', aber);
 };
+
+const requestLocationPermission = async () => {
+  try {
+    const checkLocationPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+
+    if (checkLocationPermission) {
+      return true;
+    }
+
+    const isGranted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title:
+          '¿Permitir que "Tenpo" acceda a tu ubicación mientras usas la app?',
+        message:
+          'Tu ubicación actual se mostrará en el mapa y se usará para las indicaciones, los resultados de búsqueda y la hora aproximada de llegada',
+        buttonNegative: 'No Permitir',
+        buttonPositive: 'Permitir',
+      },
+    );
+
+    if (isGranted === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
+export {getCoords, useGetCoords, requestLocationPermission};

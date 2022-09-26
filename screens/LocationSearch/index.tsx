@@ -1,58 +1,137 @@
-import React, {useEffect, useState, useContext} from 'react';
-import {Platform, Pressable, Alert, Modal, View} from 'react-native';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
+import {Platform, Modal, View, Text} from 'react-native';
 import {Address, Typography} from '../../components';
 import {
   AddressInputSearch,
   KeyboardAvoidView,
   WaitingLocation,
   ModalView,
+  MapViewStyled,
+  AddressInputWrapper,
+  CloseIconWrapper,
+  AddressDetailContainer,
+  DetailInput,
+  SaveAddressButton,
+  DetailInputWrapper,
 } from './styles';
-import {requestLocationPermission, getCoords} from './utils';
+import {requestLocationPermission, useGetCoords} from './utils';
 import Loader from '../../assets/icons/Loader.svg';
-import MapView from 'react-native-maps';
+import Close from '../../assets/icons/Close.svg';
 import Geocoder from 'react-native-geocoding';
 import {useUserLocationContext} from '../../context/LocationContext';
+import {Marker} from 'react-native-maps';
+import {
+  GooglePlacesAutocomplete,
+  GooglePlaceDetail,
+} from 'react-native-google-places-autocomplete';
+import SearchIcon from '../../assets/icons/SearchIcon.svg';
+
+const API_KEY = 'AIzaSyA1ejLz13IGfl5J4W7t5U5YYX86fY-_mgM';
 
 const LocationSearch = ({navigation}: any) => {
-  const [showModal, setShowModal] = useState(true);
-  const [aber, setAber] = useState({});
-  const {userAddress, updateAddress} = useUserLocationContext();
+  const [showModal, setShowModal] = useState(false);
+  const [localAddress, setLocalAddressValue] = useState('');
+  const [addressDetails, setAddressDetails] = useState('');
+  const [granted, setGranted] = useState(false);
+  const [manual, setManual] = useState(false);
+
+  const {userAddress: globalUserAddress, setUserAddress: setGlobalUserAddress} =
+    useUserLocationContext();
+
+  const [regionCoords, setRegionCoords] = useState({
+    latitude: -33.459229,
+    longitude: -70.645348,
+  });
+
+  const mapRef = useRef(null);
 
   useEffect(() => {
     if (!Geocoder.isInit) {
-      Geocoder.init('AIzaSyA1ejLz13IGfl5J4W7t5U5YYX86fY-_mgM');
+      Geocoder.init(API_KEY);
     }
   }, []);
 
-  useEffect(() => {
-    const locationPermission = async () => {
-      const granted = await requestLocationPermission();
+  const coords = useGetCoords();
 
-      if (granted) {
-        const coords = getCoords();
-        // const address = await Geocoder.from(coords.latitude, coords.longitude);
+  const goToLocation = useCallback(() => {
+    if (mapRef?.current) {
+      mapRef.current.animateToRegion({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.001,
+        longitudeDelta: 0.001,
+      });
+    }
+  }, [coords.latitude, coords.longitude]);
+
+  useEffect(() => {
+    setShowModal(true);
+    const locationPermission = async () => {
+      const isGranted = await requestLocationPermission();
+
+      if (isGranted && coords.latitude && coords.longitude) {
+        setGranted(true);
+        const address = await Geocoder.from(coords.latitude, coords.longitude);
+        const currentAddress = address.results[0].formatted_address;
+
+        setLocalAddressValue(currentAddress);
+
+        goToLocation();
+        setRegionCoords(prev => ({
+          ...prev,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        }));
       }
     };
 
     locationPermission();
-  }, []);
+    setShowModal(false);
+    return () => {};
+  }, [
+    coords.latitude,
+    coords.longitude,
+    setGlobalUserAddress,
+    globalUserAddress,
+    goToLocation,
+    showModal,
+  ]);
 
-  const geoCode = async (lat: number, long: number) => {
-    Geocoder.from(lat, long)
-      .then(json => {
-        const formattedAddress = json.results[0].formatted_address;
-        console.log(formattedAddress);
-        // setUserAddress((prevAddress: UserAddress) => ({
-        //   ...prevAddress,
-        //   address: formattedAddress,
-        // }));
-        // saveAddress({userAddress: formattedAddress});
-        // setAber({formattedAddress});
-      })
-      .catch(error => console.warn(error));
+  const handleSaveAddress = () => {
+    if (!localAddress) {
+      return;
+    }
+
+    setGlobalUserAddress(prev => {
+      return {
+        ...prev,
+        address: localAddress,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        details: addressDetails,
+      };
+    });
+
+    navigation.navigate('Home');
   };
 
-  
+  const handleCloseIconPress = () => {
+    setLocalAddressValue('');
+    setManual(true);
+  };
+
+  const handlePressSuggestion = (details: GooglePlaceDetail | null) => {
+    if (!details) {
+      return;
+    }
+
+    setLocalAddressValue(details.formatted_address);
+    setRegionCoords(prev => ({
+      ...prev,
+      latitude: details.geometry.location.lat,
+      longitude: details.geometry.location.lng,
+    }));
+  };
 
   return (
     <KeyboardAvoidView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -65,25 +144,98 @@ const LocationSearch = ({navigation}: any) => {
         </ModalView>
       </Modal>
       <Address />
-      {/* text color #40AB9E when its setted*/}
-      <AddressInputSearch placeholder="Escribe tu dirección" />
 
-      <MapView
-        style={{height: 250, width: '100%', top: '-5%', zIndex: 0}}
-        initialRegion={{
-          latitude: -33.459229,
-          longitude: -70.645348,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      />
-      <WaitingLocation>
-        <Pressable onPress={async () => await requestLocationPermission()}>
+      <AddressInputWrapper>
+        {granted && !manual ? (
+          <>
+            <AddressInputSearch
+              placeholder="Escribe tu dirección"
+              value={localAddress}
+              color={globalUserAddress?.address ? '#40AB9E' : 'black'}
+              onChangeText={setLocalAddressValue}
+            />
+            <CloseIconWrapper onPress={handleCloseIconPress}>
+              <Close />
+            </CloseIconWrapper>
+          </>
+        ) : (
+          <>
+            <GooglePlacesAutocomplete
+              placeholder="Escribe tu dirección"
+              query={{key: API_KEY}}
+              fetchDetails
+              onPress={(_data, details = null) =>
+                handlePressSuggestion(details)
+              }
+              listEmptyComponent={() => (
+                <View style={{flex: 1}}>
+                  <Text>No se encontraron resultados</Text>
+                </View>
+              )}
+            />
+            <SearchIcon />
+          </>
+        )}
+      </AddressInputWrapper>
+
+      {granted && !manual && (
+        <MapViewStyled
+          ref={mapRef}
+          region={
+            regionCoords && {
+              ...regionCoords,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }
+          }>
+          {granted &&
+            regionCoords.latitude &&
+            regionCoords.longitude &&
+            !manual && (
+              <Marker
+                identifier="currentLocation"
+                coordinate={{
+                  latitude: regionCoords.latitude,
+                  longitude: regionCoords.longitude,
+                }}
+                image={require('../../assets/images/TenpoMarker.png')}
+              />
+            )}
+        </MapViewStyled>
+      )}
+
+      {!granted && manual && (
+        <WaitingLocation>
           <Typography color="#c2c2c2" size={16}>
             Esperando tu ubicación...
           </Typography>
-        </Pressable>
-      </WaitingLocation>
+        </WaitingLocation>
+      )}
+
+      {!showModal && (
+        <AddressDetailContainer>
+          <Typography size={16} fontWeight="bold" color="#333333">
+            Agregar informacion de Entrega
+          </Typography>
+          <Typography size={14} color="#ADADAD">
+            Depto, Oficina, Piso, Block.
+          </Typography>
+          <DetailInputWrapper>
+            <DetailInput
+              multiline
+              numberOfLines={5}
+              textAlignVertical="top"
+              value={addressDetails}
+              onChangeText={setAddressDetails}
+            />
+          </DetailInputWrapper>
+          <SaveAddressButton onPress={handleSaveAddress}>
+            <Typography color="white" size={16}>
+              AGREGAR DIRECCIÓN
+            </Typography>
+          </SaveAddressButton>
+        </AddressDetailContainer>
+      )}
     </KeyboardAvoidView>
   );
 };

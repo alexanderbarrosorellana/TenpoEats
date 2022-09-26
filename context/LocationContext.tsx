@@ -4,23 +4,23 @@ import React, {
   useState,
   useContext,
   useMemo,
-  useCallback,
 } from 'react';
 
 export type UserAddress = {
   address?: string;
   latitude?: number;
   longitude?: number;
+  details?: string;
 };
 
 export type LocationContextType = {
   userAddress: UserAddress;
-  updateAddress: (userAddress: UserAddress) => void;
+  setUserAddress: (userAddress: UserAddress) => void;
 };
 
-const LocationContext = createContext<LocationContextType | null>({
+const LocationContext = createContext<LocationContextType>({
   userAddress: {},
-  updateAddress: () => {},
+  setUserAddress: () => {},
 });
 
 type Props = {
@@ -30,18 +30,12 @@ type Props = {
 const LocationContextProvider: React.FC<Props> = ({children}) => {
   const [userAddress, setUserAddress] = useState<UserAddress>({});
 
-  const updateAddress = useCallback(() => {
-    (address: UserAddress) => {
-      setUserAddress((prev: UserAddress) => ({...prev, ...address}));
-    };
-  }, []);
-
   const contextValue = useMemo(
     () => ({
       userAddress,
-      updateAddress,
+      setUserAddress,
     }),
-    [userAddress, updateAddress],
+    [userAddress, setUserAddress],
   );
 
   return (

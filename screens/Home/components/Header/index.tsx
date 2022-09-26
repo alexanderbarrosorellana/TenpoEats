@@ -18,62 +18,76 @@ import Phone from '../../../../assets/images/Phone.png';
 import SparkIcon from '../../../../assets/icons/Spark.svg';
 import SearchIcon from '../../../../assets/icons/SearchIcon.svg';
 import DotsIcon from '../../../../assets/icons/Dots.svg';
+import {useNavigation} from '@react-navigation/native';
+import {useUserLocationContext} from '../../../../context/LocationContext';
 
-const Header = () => (
-  <HeaderContainer>
-    <HeaderSection>
-      <Image source={ProfilePicture} />
-      <Container flexDirection="row" marginLeft={100}>
-        <SparkWrapper paddingTop={50} paddingLeft={50} rotate={25}>
-          <SparkIcon />
-        </SparkWrapper>
+const Header = () => {
+  const navigation = useNavigation();
+  const {userAddress} = useUserLocationContext();
 
-        <SparkWrapper paddingTop={30} paddingLeft={10}>
-          <SparkIcon />
-        </SparkWrapper>
-      </Container>
+  const handleSearchLocation = () => {
+    if (userAddress?.address) {
+      return navigation.navigate('RestaurantSearch');
+    }
+    return navigation.navigate('LocationSearch');
+  };
 
-      <Container alignItems="flex-end" marginRight={15}>
-        <SearchIconWrapper onPress={() => console.log('pressed search icon')}>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <SparkWrapper paddingTop={30} paddingRight={20} rotate={30}>
-          <SparkIcon />
-        </SparkWrapper>
-      </Container>
-    </HeaderSection>
+  return (
+    <HeaderContainer>
+      <HeaderSection>
+        <Image source={ProfilePicture} />
+        <Container flexDirection="row" marginLeft={100}>
+          <SparkWrapper paddingTop={50} paddingLeft={50} rotate={25}>
+            <SparkIcon />
+          </SparkWrapper>
 
-    <LogoSection>
-      <View>
-        <Typography size={42} color="black" fontWeight="bold">
-          Tenpo
-        </Typography>
-        <Typography size={42} color="#00BAA4" fontWeight="bold">
-          Eats
-        </Typography>
-        <Typography size={12} fontWeight="bold">
-          DELIVERY APP
-        </Typography>
-      </View>
+          <SparkWrapper paddingTop={30} paddingLeft={10}>
+            <SparkIcon />
+          </SparkWrapper>
+        </Container>
 
-      <ImageContainer>
-        <ImageWrapper zIndex={0} left={50} top={10}>
-          <Image source={MotoBoy} />
-        </ImageWrapper>
-        <ImageWrapper zIndex={1}>
-          <Image source={Phone} />
-        </ImageWrapper>
-      </ImageContainer>
+        <Container alignItems="flex-end" marginRight={15}>
+          <SearchIconWrapper onPress={handleSearchLocation}>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <SparkWrapper paddingTop={30} paddingRight={20} rotate={30}>
+            <SparkIcon />
+          </SparkWrapper>
+        </Container>
+      </HeaderSection>
 
-      <RightContainer>
-        <SparkWrapper paddingTop={65} paddingLeft={20} rotate={40}>
-          <SparkIcon />
-        </SparkWrapper>
+      <LogoSection>
+        <View>
+          <Typography size={42} color="black" fontWeight="bold">
+            Tenpo
+          </Typography>
+          <Typography size={42} color="#00BAA4" fontWeight="bold">
+            Eats
+          </Typography>
+          <Typography size={12} fontWeight="bold">
+            DELIVERY APP
+          </Typography>
+        </View>
 
-        <DotsIcon />
-      </RightContainer>
-    </LogoSection>
-  </HeaderContainer>
-);
+        <ImageContainer>
+          <ImageWrapper zIndex={0} left={50} top={10}>
+            <Image source={MotoBoy} />
+          </ImageWrapper>
+          <ImageWrapper zIndex={1}>
+            <Image source={Phone} />
+          </ImageWrapper>
+        </ImageContainer>
+
+        <RightContainer>
+          <SparkWrapper paddingTop={65} paddingLeft={20} rotate={40}>
+            <SparkIcon />
+          </SparkWrapper>
+
+          <DotsIcon />
+        </RightContainer>
+      </LogoSection>
+    </HeaderContainer>
+  );
+};
 
 export default Header;
