@@ -15,14 +15,11 @@ export const getRestaurants = (
       const filterByDistance = filteredRestaurants.filter(
         ({distance}) => distance <= distanceFilter,
       );
-      console.log('filterByDistance :>> ', filterByDistance);
 
       if (isOpenFilter) {
-        console.log('como ke si')
         const filterByIsOpen = filterByDistance.filter(
           ({isOpen}) => isOpen === isOpenFilter,
         );
-        console.log('filterByItsOpen :>> ', filterByIsOpen);
         resolve(filterByIsOpen);
       }
 

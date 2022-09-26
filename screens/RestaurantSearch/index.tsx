@@ -46,8 +46,6 @@ const RestaurantSearch = ({navigation}) => {
       condition => condition === false,
     ).length;
 
-    console.log(conditionStoreFalseCount);
-
     if (conditionStoreFalseCount >= 2) {
       isSuccess = true;
     }
@@ -82,7 +80,6 @@ const RestaurantSearch = ({navigation}) => {
     }
   };
 
-  console.log(conditionStore);
   const handleRetry = () => {
     handleFetchRestaurants();
   };
