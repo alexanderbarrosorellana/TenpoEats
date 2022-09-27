@@ -74,14 +74,10 @@ const RestaurantSearch = ({navigation}) => {
       setFetchedRestaurants(restaurants);
     } catch (error) {
       Alert.alert('Error', 'Error trying to fetch', [
-        {text: 'Retry', onPress: handleRetry},
+        {text: 'Retry', onPress: async () => handleFetchRestaurants},
         {text: 'Cancel'},
       ]);
     }
-  };
-
-  const handleRetry = () => {
-    handleFetchRestaurants();
   };
 
   const handleSubmitEditing = (
