@@ -25,8 +25,7 @@ import {
   GooglePlaceDetail,
 } from 'react-native-google-places-autocomplete';
 import SearchIcon from '../../assets/icons/SearchIcon.svg';
-
-const API_KEY = 'AIzaSyA1ejLz13IGfl5J4W7t5U5YYX86fY-_mgM';
+import config from '../../config';
 
 const LocationSearch = ({navigation}: any) => {
   const [showModal, setShowModal] = useState(false);
@@ -47,7 +46,7 @@ const LocationSearch = ({navigation}: any) => {
 
   useEffect(() => {
     if (!Geocoder.isInit) {
-      Geocoder.init(API_KEY);
+      Geocoder.init(config.ALEX_GOOGLE_MAPS_API_KEY);
     }
   }, []);
 
@@ -162,7 +161,7 @@ const LocationSearch = ({navigation}: any) => {
           <>
             <GooglePlacesAutocomplete
               placeholder="Escribe tu dirección"
-              query={{key: API_KEY}}
+              query={{key: config.ALEX_GOOGLE_MAPS_API_KEY}}
               fetchDetails
               onPress={(_data, details = null) =>
                 handlePressSuggestion(details)
