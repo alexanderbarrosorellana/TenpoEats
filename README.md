@@ -14,6 +14,29 @@ This is a simple application using react native maps integration with google map
 
 You can follow [this guide](https://reactnative.dev/docs/environment-setup) to setup your environment.
 
+## Setting API keys
+
+You will have to create a dotenv file in the root of your proyect:
+
+```bash
+touch .env
+```
+
+Inside that file you need to add a google maps API KEY named ALEX_GOOGLE_MAPS_API_KEY (you can change the name, but make sure that you change it everywhere) it is going to look like this
+
+`ALEX_GOOGLE_MAPS_API_KEY=yourGoogleMapsApiKey`
+
+Now you are going to do the same, inside android folder, like so:
+
+```bash
+cd android && touch local.properties
+```
+
+And add the same api key like this:
+
+`ALEX_GOOGLE_MAPS_API_KEY=yourGoogleMapsApiKey`
+
+
 ## Dependencies used: 
 
 - node: v16.17.0
